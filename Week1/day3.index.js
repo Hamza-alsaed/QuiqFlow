@@ -11,9 +11,9 @@ const users = [
 // Closure to track searches
 function createSearchTracker() {
     let searchCount = 0;
-    return function(keyword) {
+    return function() {
         searchCount++;
-        console.log(`Search #${searchCount} for: "${keyword}"`);
+        return searchCount; // return count instead of logging
     };
 }
 
@@ -21,16 +21,28 @@ const trackSearch = createSearchTracker();
 
 // Search function using filter + map
 const searchUsers = (keyword) => {
-    trackSearch(keyword); // closure call
-    return users
-        .filter(user => user.name.toLowerCase().includes(keyword.toLowerCase()))
+    const searchNumber = trackSearch(); // get search count
+    const lowerKeyword = keyword.toLowerCase(); // save lowercase once
+
+    const results = users
+        .filter(user => {
+            const lowerName = user.name.toLowerCase(); // save lowercase once
+            return lowerName.includes(lowerKeyword);
+        })
         .map(user => ({ name: user.name, age: user.age }));
+
+    console.log(`Search #${searchNumber} for: "${keyword}"`);
+    return {
+        keyword,
+        count: results.length,
+        results
+    };
 };
 
 // Example searches
-console.log(searchUsers("alice"));  
-console.log(searchUsers("smith"));  
-console.log(searchUsers("o"));      // matches names containing 'o'
+console.log(searchUsers("alice"));
+console.log(searchUsers("smith"));
+console.log(searchUsers("o"));
 
 // JSON example
 const jsonData = JSON.stringify(users);
