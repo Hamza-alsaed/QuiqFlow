@@ -1,91 +1,81 @@
-"use strict"; // Enforces stricter rules in JavaScript (helps avoid bugs)
+"use strict"; // Enforces stricter JavaScript rules to avoid common bugs
 
-// Import readline module for CLI input/output
-const readline = require("readline");
+const readline = require("readline"); // Import Node.js readline module for CLI input/output
+const fetch = require("node-fetch"); // Import fetch for Node.js
 
-// Fetch data from API
+// Async function to fetch data from JSONPlaceholder API
 async function fetchData() {
   try {
-    // Make GET request to JSONPlaceholder posts endpoint
-    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts"); // GET request to API
 
-    // If response is not OK (status not 200-299), throw an error
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`); // Throw error if request fails
 
-    // Parse and return JSON data
-    return await response.json();
+    return await response.json(); // Parse and return JSON data
   } catch (error) {
-    // If there’s any error (network/API), log it and return empty array
-    console.error("Error fetching data:", error.message);
-    return [];
+    console.error("Error fetching data:", error.message); // Log error
+    return []; // Return empty array if fetch fails
   }
 }
 
-
-// Search and filter posts
+// Function to search posts based on keyword
 function searchPosts(posts, keyword) {
+  const lowerKeyword = keyword.toLowerCase(); // Convert keyword once to avoid multiple .toLowerCase() calls
   return posts
-    // Filter: check if title OR body contains the keyword (case-insensitive)
-    .filter(post =>
-      post.title.toLowerCase().includes(keyword.toLowerCase()) ||
-      post.body.toLowerCase().includes(keyword.toLowerCase())
-    )
-    // Map: return only post ID and title to keep output clean
+    .filter(post => {
+      const title = post.title.toLowerCase();
+      const body = post.body.toLowerCase();
+      return title.includes(lowerKeyword) || body.includes(lowerKeyword);
+    })
     .map(post => ({
-      id: post.id,
-      title: post.title
+      id: post.id,   // Return only id
+      title: post.title // and title to keep output clean
     }));
+}
+
+// Helper function to ask a question and return a Promise
+function askQuestion(rl, question) {
+  return new Promise(resolve => rl.question(question, resolve));
 }
 
 // Main CLI program
 async function main() {
-  // Fetch all posts from API
-  const posts = await fetchData();
+  const posts = await fetchData(); // Fetch all posts from API
 
-  // Exit if no data available
   if (posts.length === 0) {
     console.log("No data available. Exiting.");
-    process.exit(1);
+    process.exit(1); // Exit if no data
   }
 
-  // Create readline interface for CLI input
+  // Setup readline interface for CLI
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
 
-  // Function to repeatedly ask the user for search keywords
-  function askQuestion() {
-    rl.question("\nEnter a search keyword (or type 'exit' to quit): ", (input) => {
-      // If user types "exit", close the CLI
-      if (input.toLowerCase() === "exit") {
-        console.log("Goodbye!");
-        rl.close();
-        return;
-      }
-
-      // Search posts based on user input
-      const results = searchPosts(posts, input);
-
-      // If no matches found, tell the user
-      if (results.length === 0) {
-        console.log("No matches found.");
-      } else {
-        // Otherwise, display the results
-        console.log(`\nFound ${results.length} result(s):`);
-        results.forEach(r => console.log(`ID: ${r.id} | Title: ${r.title}`));
-      }
-
-      // Ask for another search keyword
-      askQuestion();
-    });
-  }
-
-  // Welcome message
   console.log("Welcome to the JSONPlaceholder CLI Search!");
-  
-  // Start first question
-  askQuestion();
+
+  let exit = false;
+
+  // Loop to repeatedly ask for user input until "exit"
+  while (!exit) {
+    const input = await askQuestion(rl, "\nEnter a search keyword (or type 'exit' to quit): ");
+
+    if (input.toLowerCase() === "exit") {
+      exit = true; // Set exit flag to true to break the loop
+      console.log("Goodbye!");
+      rl.close(); // Close readline interface
+      break;
+    }
+
+    const results = searchPosts(posts, input);
+
+    if (results.length === 0) {
+      console.log("No matches found.");
+    } else {
+      console.log(`\nFound ${results.length} result(s):`);
+      results.forEach(r => console.log(`ID: ${r.id} | Title: ${r.title}`));
+    }
+  }
 }
 
 // Run the program
