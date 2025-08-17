@@ -1,6 +1,7 @@
 {
   "name": "quiqflow",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,5 +20,10 @@
   "description": "",
   "dependencies": {
     "prompt-sync": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
   }
 }
