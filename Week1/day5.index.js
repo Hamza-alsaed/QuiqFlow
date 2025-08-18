@@ -1,7 +1,7 @@
 "use strict"; // Enforces stricter JavaScript rules to avoid common bugs
 
 const readline = require("readline"); // Import Node.js readline module for CLI input/output
-const fetch = require("node-fetch"); // Import fetch for Node.js
+// No need for node-fetch in Node 18+, fetch is built-in
 
 // Async function to fetch data from JSONPlaceholder API
 async function fetchData() {
@@ -58,13 +58,19 @@ async function main() {
 
   // Loop to repeatedly ask for user input until "exit"
   while (!exit) {
-    const input = await askQuestion(rl, "\nEnter a search keyword (or type 'exit' to quit): ");
+    let input = await askQuestion(rl, "\nEnter a search keyword (or type 'exit' to quit): ");
+    input = input.trim(); // ✅ Handle whitespace input
 
     if (input.toLowerCase() === "exit") {
       exit = true; // Set exit flag to true to break the loop
       console.log("Goodbye!");
       rl.close(); // Close readline interface
       break;
+    }
+
+    if (!input) {
+      console.log("Please enter a valid keyword.");
+      continue;
     }
 
     const results = searchPosts(posts, input);
