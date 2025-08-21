@@ -12,10 +12,12 @@ interface NoteBody {
 let notes: Note[] = [];
 let idCounter = 1;
 
+// Get all notes
 export const getNotes = (_req: Request, res: Response) => {
-  res.json(notes);
+  res.json({ success: true, data: notes });
 };
 
+// Create a new note
 export const createNote = (
   req: Request<Record<string, never>, unknown, NoteBody>,
   res: Response,
@@ -24,90 +26,88 @@ export const createNote = (
   try {
     const { content } = req.body;
     if (!content) {
-      const err = new Error('Content is required') as Error & {
-        statusCode?: number;
-      };
+      const err = new Error('Content is required') as Error & { statusCode?: number };
       err.statusCode = 400;
       throw err;
     }
 
     const newNote: Note = { id: idCounter++, content };
     notes.push(newNote);
-    res.status(201).json(newNote);
+    res.status(201).json({ success: true, data: newNote });
   } catch (err) {
     next(err);
   }
 };
 
+// Get note by ID
 export const getNoteById = (
   req: Request<{ id: string }, unknown, unknown>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id, 10);
     const note = notes.find((n) => n.id === id);
     if (!note) {
-      const err = new Error('Note not found') as Error & {
-        statusCode?: number;
-      };
+      const err = new Error('Note not found') as Error & { statusCode?: number };
       err.statusCode = 404;
       throw err;
     }
-    res.json(note);
+    res.json({ success: true, data: note });
   } catch (err) {
     next(err);
   }
 };
 
+// Update a note
 export const updateNote = (
   req: Request<{ id: string }, unknown, NoteBody>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id, 10);
     const { content } = req.body;
 
     const note = notes.find((n) => n.id === id);
     if (!note) {
-      const err = new Error('Note not found') as Error & {
-        statusCode?: number;
-      };
+      const err = new Error('Note not found') as Error & { statusCode?: number };
       err.statusCode = 404;
       throw err;
     }
 
     if (!content) {
-      const err = new Error('Content is required') as Error & {
-        statusCode?: number;
-      };
+      const err = new Error('Content is required') as Error & { statusCode?: number };
       err.statusCode = 400;
       throw err;
     }
 
     note.content = content;
-    res.json(note);
+    res.json({ success: true, data: note });
   } catch (err) {
     next(err);
   }
 };
 
-export const deleteNote = (req: Request, res: Response, next: NextFunction) => {
+// Delete a note
+export const deleteNote = (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const id = parseInt(req.params.id ?? '');
+    const id = parseInt(req.params.id, 10);
     const noteIndex = notes.findIndex((n) => n.id === id);
 
     if (noteIndex === -1) {
-      const err = new Error('Note not found') as unknown as { statusCode?: number };
+      const err = new Error('Note not found') as Error & { statusCode?: number };
       err.statusCode = 404;
       throw err;
     }
 
-    notes.splice(noteIndex, 1); // remove the note
-    res.json({ success: true });
+    notes.splice(noteIndex, 1);
+    res.json({ success: true, data: { message: 'Note deleted' } });
   } catch (err) {
     next(err);
   }
 };
-
