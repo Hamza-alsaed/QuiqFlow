@@ -1,16 +1,22 @@
 import OpenAIClient from "../clients/OpenAIClient.js";
 
 class TranslateService {
-  private client;
+  private client: OpenAIClient;
 
   constructor() {
-    this.client = OpenAIClient.getInstance(); // use Singleton
+    this.client = OpenAIClient.getInstance(); // singleton pattern
   }
 
+  /**
+   * Translates text to a target language.
+   * @param text - The text to translate
+   * @param targetLang - The language code to translate into (default: "fr")
+   * @returns Translated text
+   */
   async translate(text: string, targetLang: string = "fr"): Promise<string> {
-    // MOCK: Instead of calling OpenAI, fake it
+    // MOCK: return a formatted string instead of calling OpenAI
     return `[${targetLang}] ${text}`;
   }
 }
 
-export default new TranslateService(); // export as ready-to-use service
+export default new TranslateService(); // ready-to-use instance
