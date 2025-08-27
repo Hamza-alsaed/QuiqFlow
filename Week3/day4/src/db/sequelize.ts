@@ -1,7 +1,9 @@
+// src/db/sequelize.ts
 import { Sequelize } from "sequelize-typescript";
 import { User } from "../models/User";
 import { Room } from "../models/Room";
 import { Message } from "../models/Message";
+import Config from "../config/config";
 
 class Database {
   private static instance: Sequelize;
@@ -10,13 +12,15 @@ class Database {
 
   public static getInstance(): Sequelize {
     if (!Database.instance) {
+      const config = Config.getInstance();
+
       Database.instance = new Sequelize({
         dialect: "postgres",
-        host: process.env.DB_HOST || "127.0.0.1",
-        port: Number(process.env.DB_PORT) || 5433,
-        username: process.env.DB_USER || "admin",
-        password: process.env.DB_PASSWORD || "admin",
-        database: process.env.DB_NAME || "chatapp",
+        host: config.DB_HOST,
+        port: config.DB_PORT,
+        username: config.DB_USER,
+        password: config.DB_PASSWORD,
+        database: config.DB_NAME,
         models: [User, Room, Message],
         logging: false,
       });

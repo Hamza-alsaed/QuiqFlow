@@ -1,44 +1,35 @@
+// src/controllers/AuthController.ts
 import { Request, Response } from "express";
+import { User } from "../models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { User } from "../models/User";
+import Config from "../config/Config";
 
-const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
-
-export class AuthController {
+export default class AuthController {
   static async register(req: Request, res: Response) {
+    const { username, email, password } = req.body;
     try {
-      const { username, email, password } = req.body;
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const user = await User.create({
-        username,
-        email,
-        password: hashedPassword,
-      });
-
-      res.status(201).json({ id: user.id, username: user.username, email: user.email });
+      const hashed = await bcrypt.hash(password, 10);
+      const user = await User.create({ username, email, password: hashed });
+      res.json({ id: user.id, username: user.username, email: user.email });
     } catch (err) {
-      console.error(err);
       res.status(500).json({ error: "Failed to register user" });
     }
   }
 
   static async login(req: Request, res: Response) {
+    const { email, password } = req.body;
     try {
-      const { email, password } = req.body;
       const user = await User.findOne({ where: { email } });
+      if (!user) return res.status(404).json({ error: "User not found" });
 
-      if (!user) return res.status(400).json({ error: "Invalid email or password" });
+      const match = await bcrypt.compare(password, user.password);
+      if (!match) return res.status(401).json({ error: "Invalid credentials" });
 
-      const valid = await bcrypt.compare(password, user.password);
-      if (!valid) return res.status(400).json({ error: "Invalid email or password" });
-
-      const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign({ id: user.id }, Config.getInstance().JWT_SECRET, { expiresIn: "1h" });
       res.json({ token });
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Login failed" });
+      res.status(500).json({ error: "Failed to login" });
     }
   }
 }

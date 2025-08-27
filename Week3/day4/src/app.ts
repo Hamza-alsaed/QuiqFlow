@@ -5,25 +5,20 @@ import roomRoutes from "./routes/roomRoutes";
 import messageRoutes from "./routes/messageRoutes";
 import authRoutes from "./routes/authRoutes";
 import Database from "./db/sequelize";
-import { authenticate } from "./middleware/auth";
 
 const app = express();
 app.use(bodyParser.json());
 
-// Initialize DB
+// Initialize DB connection
 Database.getInstance()
   .authenticate()
   .then(() => console.log("DB connected"))
   .catch(err => console.error(err));
 
-// Public auth routes
-app.use("/auth", authRoutes);
-
-// Secure /rooms & /messages
-app.use("/rooms", authenticate, roomRoutes);
-app.use("/messages", authenticate, messageRoutes);
-
-// Existing /users routes
+// Routes
 app.use("/users", userRoutes);
+app.use("/rooms", roomRoutes);
+app.use("/messages", messageRoutes);
+app.use("/auth", authRoutes); // Use auth routes from constants if desired
 
 export default app;
