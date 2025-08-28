@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { User } from "../models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import Config from "../../config/Config";
+import Config from "../../config/config";
 
 export default class AuthController {
   static async register(req: Request, res: Response) {
@@ -13,6 +13,7 @@ export default class AuthController {
       const user = await User.create({ username, email, password: hashed });
       res.json({ id: user.id, username: user.username, email: user.email });
     } catch (err) {
+      console.error(err);
       res.status(500).json({ error: "Failed to register user" });
     }
   }
@@ -26,9 +27,14 @@ export default class AuthController {
       const match = await bcrypt.compare(password, user.password);
       if (!match) return res.status(401).json({ error: "Invalid credentials" });
 
-      const token = jwt.sign({ id: user.id }, Config.getInstance().JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign(
+        { id: user.id },
+        Config.getInstance().JWT_SECRET,
+        { expiresIn: "1h" }
+      );
       res.json({ token });
     } catch (err) {
+      console.error(err);
       res.status(500).json({ error: "Failed to login" });
     }
   }

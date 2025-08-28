@@ -29,7 +29,7 @@ export const getTranslatedMessages = async (req: Request, res: Response) => {
     const translated = await Promise.all(
       messages.map(async (msg) => ({
         ...msg.toJSON(),
-        text: await getTranslatedMessage(msg.content, lang as string),
+        text: await getTranslatedMessage(msg.text, lang as string),
       }))
     );
 

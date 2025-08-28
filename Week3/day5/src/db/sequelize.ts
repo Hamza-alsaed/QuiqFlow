@@ -1,9 +1,8 @@
-// src/db/sequelize.ts
 import { Sequelize } from "sequelize-typescript";
+import Config from "../../config/Config";
 import { User } from "../models/User";
 import { Room } from "../models/Room";
 import { Message } from "../models/Message";
-import Config from "../../config/config";
 
 class Database {
   private static instance: Sequelize;
@@ -13,7 +12,6 @@ class Database {
   public static getInstance(): Sequelize {
     if (!Database.instance) {
       const config = Config.getInstance();
-
       Database.instance = new Sequelize({
         dialect: "postgres",
         host: config.DB_HOST,
