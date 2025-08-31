@@ -19,6 +19,7 @@ class CacheService {
   }
 
   static async set(key: string, value: string, ttl?: number) {
+    console.log("Setting cache:", key, value, ttl);
     if (ttl) return this.getClient().set(key, value, "EX", ttl);
     return this.getClient().set(key, value);
   }
