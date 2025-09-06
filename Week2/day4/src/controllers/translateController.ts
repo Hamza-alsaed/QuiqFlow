@@ -23,7 +23,7 @@ export const translateText = async (
   next: NextFunction
 ) => {
   try {
-    const { text, lang } = req.body;
+    const { text, lang = "en" } = req.body; // default to 'en' if lang is not provided
 
     if (!text || text.trim() === "") {
       throw createError("Text is required", 400);
@@ -35,3 +35,4 @@ export const translateText = async (
     next(err);
   }
 };
+
