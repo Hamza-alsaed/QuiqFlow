@@ -12,7 +12,7 @@ A simple chat microservice built with Node.js, Express, Sequelize (PostgreSQL), 
 - **Translation**: `/translate` endpoint using OpenAI
 - **Caching**: Redis caching for recent messages
 - **Configuration**: Singleton pattern for DB and config management
-- **API Prefix**: Centralized route prefix constants
+- **API Prefix**: All routes prefixed via API_PREFIX constant (e.g. /api/v1)
 
 ## Environment Variables
 
@@ -28,7 +28,9 @@ JWT_SECRET=your_jwt_secret
 OPENAI_API_KEY=your_openai_api_key
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
-Setup
+
+## Setup 
+
 Install dependencies:
 
 bash
@@ -36,67 +38,81 @@ Copy code
 npm install
 Start PostgreSQL and Redis (Docker recommended):
 
+Start PostgreSQL and Redis (Docker recommended):
+
 bash
-Copy code
+
 docker run --name chat-redis -p 6379:6379 -d redis
+
 docker run --name chat-postgres -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=chatapp -p 5432:5432 -d postgres
 Run migrations (Sequelize / Umzug):
 
+Run migrations:
+
 bash
-Copy code
+
 npx sequelize-cli db:migrate
+
 Start the server:
 
 bash
-Copy code
+
 npm run dev
-API Endpoints
-Auth
+
+## API Endpoints
+
+Auth:
 POST /api/v1/auth/register
 
 POST /api/v1/auth/login
 
-Users
-POST /api/v1/users
+Users:
+POST /api/v1/users – Public (signup)
 
-GET /api/v1/users
+GET /api/v1/users – Protected
 
-GET /api/v1/users/:id
+GET /api/v1/users/:id – Protected
 
-PUT /api/v1/users/:id
+PUT /api/v1/users/:id – Protected
 
-DELETE /api/v1/users/:id
+DELETE /api/v1/users/:id – Protected
 
-Rooms
-POST /api/v1/rooms
+Rooms:
+POST /api/v1/rooms – Protected
 
-GET /api/v1/rooms
+GET /api/v1/rooms – Protected
 
-GET /api/v1/rooms/:id
+GET /api/v1/rooms/:id – Protected
 
-PUT /api/v1/rooms/:id
+PUT /api/v1/rooms/:id – Protected
 
-DELETE /api/v1/rooms/:id
+DELETE /api/v1/rooms/:id – Protected
 
-Messages
-POST /api/v1/messages
+Messages:
+POST /api/v1/messages – Protected
 
-GET /api/v1/messages/room/:roomId
+GET /api/v1/messages/room/:roomId – Protected
 
-Translate
+Translate:
+
 POST /api/v1/translate
 
 Body:
 
 json
-Copy code
 {
   "text": "Hello",
   "lang": "es"
 }
-Notes
-Make sure users and rooms exist before sending messages to avoid foreign key errors.
+
+## Notes
+Authentication middleware (authenticateJWT) is applied to all protected routes (/users, /rooms, /messages).
+
+Passwords now require minimum length validation.
+
+Circular imports in models resolved with interfaces instead of require().
 
 Redis caching stores recent messages for 60 seconds.
 
 OpenAI translation requires a valid OPENAI_API_KEY.
+

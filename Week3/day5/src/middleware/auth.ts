@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import Config from "../../config/Config";
+import Config from "../../config/config";
 
 const config = Config.getInstance();
 

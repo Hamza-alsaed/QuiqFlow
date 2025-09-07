@@ -2,15 +2,15 @@ import { Message } from "../models/Message";
 
 class MessageRepository {
   async createMessage(data: { text: string; userId: number; roomId: number }) {
-    return Message.create(data);
+    return await Message.create(data);
   }
 
   async getRecent(limit: number) {
-    return Message.findAll({ order: [["createdAt", "DESC"]], limit });
+    return await Message.findAll({ order: [["createdAt", "DESC"]], limit });
   }
 
   async getMessagesByRoom(roomId: number) {
-    return Message.findAll({ where: { roomId } });
+    return await Message.findAll({ where: { roomId } });
   }
 }
 
