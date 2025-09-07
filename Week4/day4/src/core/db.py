@@ -10,6 +10,12 @@ class MockDBSession:
 
     def get_users(self):
         return self.users
+    
+    def get_user_by_id(self, user_id: int):
+        return next((u for u in self._users if u["id"] == user_id), None)
+
+    def get_user_by_username(self, username: str):
+        return next((u for u in self._users if u["username"] == username), None)
 
 # Dependency injection
 def get_db() -> Generator:
