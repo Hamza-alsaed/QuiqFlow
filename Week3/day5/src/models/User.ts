@@ -9,7 +9,7 @@ export class User extends Model {
   @Column({ type: DataType.STRING, allowNull: false, unique: true })
   email!: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false, validate: { len: [8, 128] } })
   password!: string;
 
   @HasMany(() => Message)

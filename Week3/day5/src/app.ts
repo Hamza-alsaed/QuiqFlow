@@ -24,9 +24,4 @@ app.use(API_PREFIX.ROOMS, roomRoutes);
 app.use(API_PREFIX.MESSAGES, messageRoutes);
 app.use(API_PREFIX.TRANSLATE, translateRoutes);
 
-app.post("/api/v1/auth/test", (req, res) => {
-  res.json({ ok: true });
-});
-
-
 export default app;

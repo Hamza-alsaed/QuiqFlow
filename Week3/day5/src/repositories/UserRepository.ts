@@ -2,13 +2,13 @@ import { User } from "../models/User";
 
 
 export class UserRepository {
-  createUser(data: Partial<User>) {
-    return User.create(data);
+  async createUser(data: Partial<User>) {
+    return await User.create(data);
   }
-  getAllUsers() {
-    return User.findAll();
+  async getAllUsers() {
+    return await User.findAll();
   }
-  getUserById(id: number) {
-    return User.findByPk(id);
+  async getUserById(id: number) {
+    return await User.findByPk(id);
   }
 }
