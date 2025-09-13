@@ -2,7 +2,9 @@ import { Message } from "../models/Message";
 
 class MessageRepository {
   async createMessage(data: { text: string; userId: number; roomId: number }) {
+    console.log("Creating message with data:", data);
     return await Message.create(data);
+
   }
 
   async getRecent(limit: number) {

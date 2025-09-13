@@ -5,6 +5,9 @@ import { Room } from "./Room";
 
 @Table({ tableName: "messages", timestamps: true })
 export class Message extends Model {
+  static getMessagesByRoom(arg0: number) {
+    throw new Error("Method not implemented.");
+  }
   @Column({ type: DataType.TEXT, allowNull: false })
   text!: string;
 
