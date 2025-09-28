@@ -1,4 +1,3 @@
-# src/core/deps.py
 from src.clients.whisper_client import WhisperClient
 from src.clients.tts_client import TTSClient
 from src.clients.translate_client import TranslateClient

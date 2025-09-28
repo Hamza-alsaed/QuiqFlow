@@ -4,6 +4,7 @@ import openai
 from openai import OpenAI
 from src.core.config import settings
 import logging
+import asyncio
 
 logger = logging.getLogger("voice-service")
 
@@ -19,7 +20,8 @@ class TTSClient:
     async def speak(self, text: str, language: str = "en") -> BytesIO:
         logger.info(f"Synthesizing speech for text[:50]={text[:50]}...")
         try:
-            tts_response = openai.audio.speech.create(
+            tts_response = await asyncio.to_thread(
+                openai.audio.speech.create,
                 model="gpt-4o-mini-tts",
                 voice=language,
                 input=text
