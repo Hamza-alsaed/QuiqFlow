@@ -1,6 +1,6 @@
 from typing import Optional
 import logging
-from fastapi import UploadFile
+import asyncio
 from openai import OpenAI
 import openai
 from src.core.config import settings
@@ -20,11 +20,14 @@ class WhisperClient:
     async def transcribe(self, file_path: str) -> str:
         logger.info(f"Transcribing file={file_path}")
         try:
-            with open(file_path, "rb") as f:
-                transcription = self.client.audio.transcriptions.create(
-                    model="whisper-1",
-                    file=f
-                )
+            def _sync_transcribe(path: str):
+                with open(path, "rb") as f:
+                    return self.client.audio.transcriptions.create(
+                        model="whisper-1",
+                        file=f
+                    )
+
+            transcription = await asyncio.to_thread(_sync_transcribe, file_path)
             text = transcription.text
             logger.info(f"Transcription result: {text[:50]}...")
             return text
